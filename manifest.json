@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Upworkify",
+  "version": "0.0.0",
+  "description": "Helps to find information on upwork.com platform",
+  "icons": {
+    "48": "icons/upwork-icon-48.png",
+    "256": "icons/upwork-icon-256.png"
+  },
+  "permissions": ["activeTab"],
+  "browser_action": {
+    "default_icon": "icons/upwork-icon-48.png",
+    "default_title": "Upworkify",
+    "default_popup": "popup/chooseUpwork.html"
+  }
+}
+
