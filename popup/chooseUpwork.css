@@ -1,6 +1,7 @@
 html,
 body {
-  width: 100px;
+  width: 300px;
+  font-family: sans-serif;
 }
 
 .hidden {
@@ -13,7 +14,7 @@ button {
   margin: 3% auto;
   padding: 4px;
   text-align: center;
-  font-size: 1.5em;
+  font-size: 1em;
   cursor: pointer;
   background-color: #e5f2f2;
 }

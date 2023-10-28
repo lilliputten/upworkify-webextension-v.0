@@ -1,0 +1,8 @@
+/* NOTE: External styles with `file` doesn't work. */
+body {
+  border: 3px solid red;
+}
+
+body > :not(.upworkify-image) {
+  display: none !important;
+}
