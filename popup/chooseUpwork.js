@@ -1,8 +1,10 @@
+/* globals browser */
+/* eslint-disable no-console */
 /*!
  * @changed 2023.10.29, 00:07
  */
 
-var hasInstalled = false;
+// let hasInstalled = false;
 
 function getChangeTag() {
   const tag = `@changed 2023.10.29, 00:07
@@ -16,11 +18,10 @@ const storagePrefix = 'upworkify:';
 const storageFiltersKey = storagePrefix + 'filters';
 
 console.log('Started chooseUpwork', getChangeTag(), {
-  hasInstalled,
+  // hasInstalled,
   'window.hasInstalled': window.hasInstalled,
   sessionStorage,
   storage: browser.storage.local,
-  'window.filters': window.filters,
 });
 
 // Filters...
@@ -43,8 +44,13 @@ usedStorage.get('filters').then(({ filters }) => {
  * except for elements that have the "upworkify-image" class.
  */
 const pageStyles = `
+/*
 body > :not(.upworkify-image) {
   display: none !important;
+}
+*/
+body {
+  border: 4px solid blue;
 }
 body.upworkify-filters-applied {
   border: 4px solid green;
@@ -238,6 +244,7 @@ function resetFilterControls() {
 function updatePopupContent() {
   const { filters } = window;
   const {
+    // prettier-ignore
     showCountries,
     showRecents,
   } = filters;
@@ -278,12 +285,11 @@ function userActions() {
 /** There was an error executing the script. Display the popup's error message, and hide the normal UI.
  */
 function reportExecuteScriptError(error) {
-  document.querySelector("#popup-content").classList.add("hidden");
-  document.querySelector("#error-content").classList.remove("hidden");
+  document.querySelector('#popup-content').classList.add('hidden');
+  document.querySelector('#error-content').classList.remove('hidden');
   console.error('[chooseUpwork:reportExecuteScriptError]', error.message, {
     error,
   });
-  debugger;
 }
 
 // @see https://github.com/mdn/webextensions-examples/blob/main/favourite-colour/options.js
@@ -291,6 +297,7 @@ function reportExecuteScriptError(error) {
 async function init() {
   await loadFilters();
   updatePopupContent();
+  browser.tabs.insertCSS(pageStyle);
 }
 
 init();
@@ -298,8 +305,7 @@ init();
 /** When the popup loads, inject a content script into the active tab, and add a click handler. If we couldn't inject the script, handle the error.
  */
 browser.tabs
-  .executeScript({ file: "/page/client.js" })
+  .executeScript({ file: '/page/client.js' })
   // .then(listenForClicks)
   .then(userActions)
   .catch(reportExecuteScriptError);
-

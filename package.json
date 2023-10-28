@@ -5,7 +5,33 @@
   "main": "upworkify.js",
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.22.9",
+    "@babel/plugin-proposal-decorators": "^7.22.7",
+    "@babel/preset-env": "^7.22.9",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.9.0",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-jsonc": "^2.9.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-yaml": "^0.5.0",
+    "jshint": "^2.13.6",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.0.0",
+    "stylelint": "^15.10.2",
+    "stylelint-config-recommended": "^13.0.0",
+    "stylelint-config-standard": "^34.0.0",
+    "typescript": "^5.1.6"
+  },
   "scripts": {
+    "prettier": "echo --Run prettier-- && prettier --write --cache . | grep -v '(cached)' || true",
+    "stylelint": "echo --Lint styles-- && stylelint **/*.{css,scss,less}",
+    "stylelint-fix": "echo --Lint styles-- && stylelint **/*.{css,scss,less} --fix",
+    "lint": "echo --Lint sources-- && eslint . --ext js",
+    "type-check": "echo --Run typescript linter-- && tsc --pretty --noEmit",
+    "check-all": "echo --Run all pre-commit check-ups-- && npm-run-all prettier stylelint lint type-check && echo --All check-ups are passed--",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

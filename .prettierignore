@@ -1,0 +1,31 @@
+/.dependencygraph
+/.git
+/.github
+/.history
+/.husky
+/.next
+/.storybook
+/.vscode
+/__mocks__
+/build
+/coverage
+/idea
+/i18n
+/node_modules
+/public
+/public-src
+/publish
+/types
+/utils
+
+# Project folders
+webextension-polyfill
+upworks
+icons
+00-samples
+
+# Don't prettify manually-written markdowns...
+/*.md
+
+package-lock.*
+**/*_

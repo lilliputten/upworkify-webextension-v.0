@@ -1,3 +1,5 @@
+/* globals browser */
+/* eslint-disable no-console */
 /*!
  * @changed 2023.10.28, 22:03
  */
@@ -8,14 +10,9 @@ function getChangeTag() {
   return tag;
 }
 
-var hasInstalled = false;
-
 console.log('Started upworkify:page/client', getChangeTag(), {
-  hasInstalled,
-  // 'window.hasInstalled': window.hasInstalled,
   'window.hasRun': window.hasRun,
 });
-
 
 (() => {
   /**
@@ -27,7 +24,6 @@ console.log('Started upworkify:page/client', getChangeTag(), {
     return;
   }
   window.hasRun = true;
-  hasInstalled = true;
 
   /**
    * Given a URL to a upwork image, remove all existing upworks, then
@@ -38,12 +34,11 @@ console.log('Started upworkify:page/client', getChangeTag(), {
     console.log('[upworkify:page/client:insertUpwork]', {
       upworkURL,
     });
-    debugger;
     removeExistingUpworks();
-    const upworkImage = document.createElement("img");
-    upworkImage.setAttribute("src", upworkURL);
-    upworkImage.style.height = "100vh";
-    upworkImage.className = "upworkify-image";
+    const upworkImage = document.createElement('img');
+    upworkImage.setAttribute('src', upworkURL);
+    upworkImage.style.height = '100vh';
+    upworkImage.className = 'upworkify-image';
     document.body.appendChild(upworkImage);
   }
 
@@ -51,7 +46,7 @@ console.log('Started upworkify:page/client', getChangeTag(), {
    * Remove every upwork from the page.
    */
   function removeExistingUpworks() {
-    const existingUpworks = document.querySelectorAll(".upworkify-image");
+    const existingUpworks = document.querySelectorAll('.upworkify-image');
     for (const upwork of existingUpworks) {
       upwork.remove();
     }
@@ -59,6 +54,7 @@ console.log('Started upworkify:page/client', getChangeTag(), {
 
   function applyFilters(filters) {
     const {
+      // prettier-ignore
       showCountries,
       showRecents,
     } = filters;
@@ -71,6 +67,12 @@ console.log('Started upworkify:page/client', getChangeTag(), {
     document.body.classList.toggle('upworkify-filters-applied', true);
   }
 
+  function resetFilters() {
+    console.log('[upworkify:page/client:resetFilters');
+    debugger;
+    document.body.classList.toggle('upworkify-filters-applied', false);
+  }
+
   /**
    * Listen for messages from the background script.
    */
@@ -81,13 +83,13 @@ console.log('Started upworkify:page/client', getChangeTag(), {
       arg,
     });
     if (command === 'upworkify') {
-      debugger;
       insertUpwork(message.upworkURL);
     } else if (command === 'applyFilters') {
       applyFilters(message.filters);
+    } else if (command === 'resetFilters') {
+      resetFilters();
     } else if (command === 'reset') {
       removeExistingUpworks();
     }
   });
 })();
-
