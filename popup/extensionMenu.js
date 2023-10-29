@@ -1,34 +1,39 @@
+// @ts-check
+
 /* globals browser */
 /* eslint-disable no-console */
 /*!
- * @changed 2023.10.29, 00:07
+ * @changed 2023.10.29, 23:18
  */
 
-// let hasInstalled = false;
-
 function getChangeTag() {
-  const tag = `@changed 2023.10.29, 00:07
+  const tag = `@changed 2023.10.29, 23:18
   `.trim();
   return tag;
 }
+
+const changedTag = getChangeTag();
 
 // @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage
 const usedStorage = browser.storage.local;
 const storagePrefix = 'upworkify:';
 const storageFiltersKey = storagePrefix + 'filters';
 
-console.log('Started extensionMenu', getChangeTag(), {
-  // hasInstalled,
-  'window.hasInstalled': window.hasInstalled,
-  sessionStorage,
-  storage: browser.storage.local,
+console.log('Started extensionMenu', changedTag, {
+  __upworkifyChangedTag: window.__upworkifyChangedTag,
+  changedTag,
+  browser,
 });
+window.__upworkifyChangedTag = changedTag;
 
 // Filters...
+/** Default filters
+ * @type {TFilters}
+ */
 const defaultFilters = {
   showCountries: false,
-  showRecents: false,
-  __changed: getChangeTag(),
+  showRecents: '',
+  __changed: changedTag,
 };
 window.filters = { ...defaultFilters };
 
@@ -44,65 +49,103 @@ usedStorage.get('filters').then(({ filters }) => {
  * except for elements that have the "upworkify-image" class.
  */
 const pageStyles = `
-/*
-body > :not(.upworkify-image) {
+--body {
+  /* DEBUG */
+  border: 2px solid gray;
+}
+--body.upworkify-filters-applied {
+  /* DEBUG */
+  border: 2px solid red;
+}
+body.upworkify-filters-applied [data-test="job-tile-list"] .up-card-section [data-test="client-country"] {
+  /* Always show country block! */
+  display: inline-flex !important;
+}
+body.upworkify-filters-applied .row.app-frame > .col-12.col-lg-9 {
+  /* Make main column full-width */
+  flex: 1;
+  max-width: none;
+}
+body.upworkify-filters-applied .row.app-frame > .col-12.col-lg-9 > .announcements {
+  /* Hide banner */
   display: none !important;
 }
-*/
-body {
-  border: 4px solid blue;
+body.upworkify-filters-applied .row.app-frame > aside {
+  /* Hide right column */
+  display: none !important;
 }
-body.upworkify-filters-applied {
-  border: 4px solid green;
+--body.upworkify-filters-applied [data-test="job-tile-list"] {
+  border: 1px solid purple; /* DEBUG */
+}
+--body.upworkify-filters-applied [data-test="job-tile-list"] .up-card-section {
+  border: 1px solid orange; /* DEBUG */
+}
+body.upworkify-filters-applied [data-test="job-tile-list"] .up-card-section {
+  /* Dim unprocessed items */
+  opacity: .7;
+}
+body.upworkify-filters-applied [data-test="job-tile-list"] .up-card-section.processed {
+  /* Dim unprocessed items */
+  opacity: 1;
+  border: 2px solid rgba(100,100,100,.2); /* DEBUG */
+  border-radius: 8px;
+  margin: 10px auto;
+}
+body.upworkify-filters-applied .hilite {
+  background-color: rgba(0,128,0,.4);
+  color: #000 !important;
+  font-weight: normal;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
 }
 `;
 
-// // NOTE: External styles with `file` doesn't work.
-// const pageStyle = { file: 'styles.css' };
+/* // NOTE: External styles with `file` doesn't work.
+ * const pageStyle = { file: 'styles.css' };
+ */
 const pageStyle = { code: pageStyles };
 
+/** @return Promise */
 function getCurrentTabPromise() {
   return browser.tabs.query({ active: true, currentWindow: true });
 }
 
 async function saveFilters() {
-  // const json = JSON.stringify(filters);
-  console.log('[extensionMenu:saveFilters]', {
-    filters: window.filters,
-    // json,
-    storageFiltersKey,
-    usedStorage,
-  });
-  // sessionStorage?.setItem(storageFiltersKey, json);
-  // window.filters = filters;
-  await usedStorage.set({ filters: window.filters });
-  console.log('[extensionMenu:saveFilters] done');
+  /* console.log('[extensionMenu:saveFilters]', {
+   *   filters: window.filters,
+   *   storageFiltersKey,
+   *   usedStorage,
+   * });
+   */
+  const obj = { filters: window.filters };
+  await usedStorage.set(obj);
+  // console.log('[extensionMenu:saveFilters] done');
 }
 
 async function loadFilters() {
-  // const json = sessionStorage?.getItem(storageFiltersKey);
-  // filters = json ? JSON.parse(json) : { ...defaultFilters };
-  console.log('[extensionMenu:loadFilters]', {
-    // filters,
-    // json,
-    storageFiltersKey,
-    // 'window.filters': window.filters,
-  });
+  /*
+   * console.log('[extensionMenu:loadFilters]', {
+   *   storageFiltersKey,
+   * });
+   */
+  /** @type {{ filters: TFilters }} */
   const { filters } = await usedStorage.get('filters');
-  console.log('[extensionMenu:loadFilters] done', {
-    filters,
-    storageFiltersKey,
-  });
+  /* console.log('[extensionMenu:loadFilters] done', {
+   *   filters,
+   *   storageFiltersKey,
+   * });
+   */
   window.filters = filters ? { ...filters } : { ...defaultFilters };
 }
 
-function applyFilters() {
+/** @return {Promise} */
+function applyFiltersInTarget() {
   const { filters } = window;
-  console.log('[extensionMenu:applyFilters]', {
+  console.log('[extensionMenu:applyFiltersInTarget]', {
     filters,
   });
-  // Save filters in storage...
-  getCurrentTabPromise()
+  return getCurrentTabPromise()
     .then((tabs) => {
       browser.tabs.sendMessage(tabs[0].id, {
         command: 'applyFilters',
@@ -112,14 +155,13 @@ function applyFilters() {
     .catch(reportError);
 }
 
-function resetFilters() {
+/** @return {Promise} */
+function resetFiltersInTaget() {
   const { filters } = window;
-  console.log('[extensionMenu:resetFilters]', {
+  console.log('[extensionMenu:resetFiltersInTaget]', {
     filters,
   });
-  // Reset filters data and interface...
-  window.filters = { ...defaultFilters };
-  getCurrentTabPromise()
+  return getCurrentTabPromise()
     .then((tabs) => {
       browser.tabs.sendMessage(tabs[0].id, {
         command: 'resetFilters',
@@ -128,168 +170,113 @@ function resetFilters() {
     .catch(reportError);
 }
 
+function handleResetFilters() {
+  // Reset filters data and interface...
+  window.filters = { ...defaultFilters };
+  // Update popup state (is it required? -- it'll be refreshed on the next opening)...
+  updatePopupContent();
+  // Reset filters in the target page...
+  resetFiltersInTaget();
+}
+
 function getShowCountriesCheckbox() {
-  return document.getElementById('showCountries');
+  return /** @type {HTMLInputElement} */ (document.getElementById('showCountries'));
+}
+function getShowRecentsInput() {
+  return /** @type {HTMLInputElement} */ (document.getElementById('showRecents'));
 }
 function getApplyButton() {
-  return document.getElementById('apply');
+  return /** @type {HTMLButtonElement} */ (document.getElementById('apply'));
 }
 function getResetButton() {
-  return document.getElementById('reset');
+  return /** @type {HTMLButtonElement} */ (document.getElementById('reset'));
 }
 
-function resetFilterControls() {
-  const showCountriesCheckbox = getShowCountriesCheckbox();
-  showCountriesCheckbox.checked = false;
+/**
+ * Just log the error to the console.
+ * @param {Error} error
+ */
+function reportError(error) {
+  // eslint-disable-next-line no-console
+  console.error('[extensionMenu:reportError]', error.message, {
+    error,
+  });
+  // eslint-disable-next-line no-debugger
+  debugger;
 }
-
-/* function __debugClick (e) {
- *   [>*
- *    * Given the name of a upwork, get the URL to the corresponding image.
- *    <]
- *   function upworkNameToURL(upworkName) {
- *     console.log('[extensionMenu:listenForClicks:upworkNameToURL]', {
- *       upworkName,
- *     });
- *     switch (upworkName) {
- *       case "Frog":
- *         return browser.runtime.getURL("upworks/frog.jpg");
- *       case "Snake":
- *         return browser.runtime.getURL("upworks/snake.jpg");
- *       case "Turtle":
- *         return browser.runtime.getURL("upworks/turtle.jpg");
- *     }
- *   }
- *   [>*
- *    * Insert the page-hiding CSS into the active tab,
- *    * then get the upwork URL and
- *    * send a "upworkify" message to the content script in the active tab.
- *    <]
- *   function doUpworkify(tabs) {
- *     console.log('[extensionMenu:listenForClicks:doUpworkify]', {
- *       hasInstalled,
- *       'window.hasInstalled': window.hasInstalled,
- *       tabs,
- *       textContent: e.target.textContent,
- *     });
- *     hasInstalled = true;
- *     window.hasInstalled = true;
- *     browser.tabs
- *       .insertCSS(pageStyle)
- *       .then(() => {
- *         const url = upworkNameToURL(e.target.textContent);
- *         browser.tabs.sendMessage(tabs[0].id, {
- *           command: "upworkify",
- *           upworkURL: url,
- *         });
- *       })
- *     ;
- *   }
- *   [>*
- *    * Remove the page-hiding CSS from the active tab,
- *    * send a "reset" message to the content script in the active tab.
- *    <]
- *   function doReset(tabs) {
- *     console.log('[extensionMenu:listenForClicks:doReset]', {
- *       hasInstalled,
- *       'window.hasInstalled': window.hasInstalled,
- *       tabs,
- *     });
- *     hasInstalled = false;
- *     window.hasInstalled = false;
- *     browser.tabs
- *       .removeCSS(pageStyle)
- *       .then(() => {
- *         browser.tabs.sendMessage(tabs[0].id, {
- *           command: "reset",
- *         });
- *       })
- *     ;
- *   }
- *   [>*
- *    * Just log the error to the console.
- *    <]
- *   function reportError(error) {
- *     console.error('[extensionMenu:reportError]', error.message, {
- *       error,
- *     });
- *     debugger;
- *   }
- *   [>*
- *    * Get the active tab,
- *    * then call "doUpworkify()" or "doReset()" as appropriate.
- *    <]
- *   if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) {
- *     // Ignore when click is not on a button within <div id="popup-content">.
- *     return;
- *   }
- *   if (e.target.type === "reset") {
- *     getCurrentTabPromise()
- *       .then(doReset)
- *       .catch(reportError);
- *   } else {
- *     getCurrentTabPromise()
- *       .then(doUpworkify)
- *       .catch(reportError);
- *   }
- * }
- */
-/** Listen for clicks on the buttons, and send the appropriate message to the content script in the page.
- */
-/* function listenForClicks() {
- *   document.addEventListener("click", __debugClick);
- * }
- */
 
 function updatePopupContent() {
   const { filters } = window;
-  const {
-    // prettier-ignore
-    showCountries,
-    showRecents,
-  } = filters;
-  console.log('[extensionMenu:updatePopupContent]', {
-    showCountries,
-    showRecents,
-    filters,
-  });
+  /* console.log('[extensionMenu:updatePopupContent]', {
+   *   filters,
+   * });
+   */
+  // Update controls...
   const showCountriesCheckbox = getShowCountriesCheckbox();
   showCountriesCheckbox.checked = filters.showCountries;
+  const showRecentsInput = getShowRecentsInput();
+  showRecentsInput.value = String(Number(filters.showRecents) || '');
+}
+
+/** @param {Event} ev
+ */
+function handleShowCountriesUpdate(ev) {
+  const { filters } = window;
+  const input = /** @type {HTMLInputElement} */ (ev.currentTarget);
+  const { checked } = input;
+  /* console.log('[extensionMenu:showCountries:onChange]', {
+   *   checked,
+   *   ev,
+   * });
+   */
+  filters.showCountries = checked;
+  saveFilters();
+}
+
+/** @param {Event} ev
+ */
+function handleShowRecentsUpdate(ev) {
+  const { filters } = window;
+  const input = /** @type {HTMLInputElement} */ (ev.currentTarget);
+  const { value } = input;
+  /* console.log('[extensionMenu:showRecents:onChange]', {
+   *   checked,
+   *   ev,
+   * });
+   */
+  filters.showRecents = (!isNaN(Number(value)) && Number(value)) || '';
+  saveFilters();
 }
 
 function userActions() {
-  const { filters } = window;
   const showCountriesCheckbox = getShowCountriesCheckbox();
+  const showRecentsInput = getShowRecentsInput();
   const applyButton = getApplyButton();
   const resetButton = getResetButton();
-  console.log('[extensionMenu:userActions]', {
-    showCountriesCheckbox,
-    applyButton,
-    resetButton,
-  });
-  showCountriesCheckbox?.addEventListener('change', (ev) => {
-    const { currentTarget } = ev;
-    const { checked } = currentTarget;
-    /* console.log('[extensionMenu:showCountries:onChange]', {
-     *   checked,
-     *   ev,
-     * });
-     */
-    filters.showCountries = checked;
-    saveFilters();
-  });
-  applyButton?.addEventListener('click', applyFilters);
-  resetButton?.addEventListener('click', resetFilters);
+  /* console.log('[extensionMenu:userActions]', {
+   *   showCountriesCheckbox,
+   *   applyButton,
+   *   resetButton,
+   * });
+   */
+  showCountriesCheckbox?.addEventListener('change', handleShowCountriesUpdate);
+  showRecentsInput?.addEventListener('change', handleShowRecentsUpdate);
+  applyButton?.addEventListener('click', applyFiltersInTarget);
+  resetButton?.addEventListener('click', handleResetFilters);
 }
 
 /** There was an error executing the script. Display the popup's error message, and hide the normal UI.
+ * @param {Error} error
  */
 function reportExecuteScriptError(error) {
   document.querySelector('#popup-content').classList.add('hidden');
   document.querySelector('#error-content').classList.remove('hidden');
+  // eslint-disable-next-line no-console
   console.error('[extensionMenu:reportExecuteScriptError]', error.message, {
     error,
   });
+  // eslint-disable-next-line no-debugger
+  debugger;
 }
 
 // @see https://github.com/mdn/webextensions-examples/blob/main/favourite-colour/options.js
@@ -297,15 +284,16 @@ function reportExecuteScriptError(error) {
 async function init() {
   await loadFilters();
   updatePopupContent();
-  browser.tabs.insertCSS(pageStyle);
+  const tabs = await getCurrentTabPromise();
+  const tabId = tabs[0].id;
+  browser.tabs.insertCSS(tabId, pageStyle);
+  /** When the popup loads, inject a content script into the active tab, and add a click handler. If we couldn't inject the script, handle the error.
+   */
+  browser.tabs
+    .executeScript(tabId, { file: '/page/client.js' })
+    // .then(listenForClicks)
+    .then(userActions)
+    .catch(reportExecuteScriptError);
 }
 
 init();
-
-/** When the popup loads, inject a content script into the active tab, and add a click handler. If we couldn't inject the script, handle the error.
- */
-browser.tabs
-  .executeScript({ file: '/page/client.js' })
-  // .then(listenForClicks)
-  .then(userActions)
-  .catch(reportExecuteScriptError);

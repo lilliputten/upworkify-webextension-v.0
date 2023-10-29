@@ -6,17 +6,31 @@
   </head>
   <body>
     <div id="popup-content">
-      <div class="input input-checkbox">
-        <input type="checkbox" id="showCountries" name="showCountries" value="showCountries">
-        <label for="showCountries"> Highlight Countries</label>
+      <div id="form-items">
+        <div class="input input-checkbox">
+          <input type="checkbox" id="showCountries" name="showCountries" value="showCountries">
+          <label for="showCountries"> Highlight countries</label>
+        </div>
+        <div class="input input-checkbox">
+          <!--
+          <input type="checkbox" id="showRecents" name="showRecents" value="showRecents">
+          -->
+          <label for="showRecents"> Highlight items for last</label>
+          <input type="text" id="showRecents" name="showRecents" value="showRecents" value="" size="3" />
+          hour(s)
+        </div>
       </div>
-      <button id="apply">Apply</button>
-      <button id="reset" type="reset">Reset</button>
       <!--
-      <button>Frog</button>
-      <button>Turtle</button>
-      <button>Snake</button>
+        TODO:
+        - Proposals amount
+        - Always show countries
+        - Hide extra blocks (right column, banner)
+        - Highlight recent: (less than) hours
       -->
+      <div id="form-buttons">
+        <button id="apply">Apply</button>
+        <button id="reset" type="reset">Reset</button>
+      </div>
     </div>
     <div id="error-content" class="hidden">
       <p>Can't upworkify this web page.</p>

@@ -21,7 +21,11 @@
       "@/*": ["./*"]
     }
   },
-  "typeRoots": ["@types/**/*"],
+  "typeRoots": [
+    "node_modules/@types",
+    "node_modules/web-ext-types/global",
+    "@types/**/*"
+  ],
   "include": ["**/*.ts", "**/*.js"],
   "exclude": ["node_modules", ".git", ".vscode", "docs", "tests", "**/*_"]
 }

@@ -23,7 +23,8 @@
     "stylelint": "^15.10.2",
     "stylelint-config-recommended": "^13.0.0",
     "stylelint-config-standard": "^34.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "web-ext-types": "^3.2.1"
   },
   "scripts": {
     "prettier": "echo --Run prettier-- && prettier --write --cache . | grep -v '(cached)' || true",
