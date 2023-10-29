@@ -49,11 +49,9 @@ In firefox, open system pages:
 
 ## Screenshots
 
-Initial screen:
-
 ![Starting minimal working version](00-samples/231029-shot.png "Starting minimal working version")
 
 <!--
-@changed 2023.10.30, 00:22
+@changed 2023.10.30, 00:32
 vim:ic
 -->
