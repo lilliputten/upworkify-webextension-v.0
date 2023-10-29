@@ -18,10 +18,10 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "/": ["bw_matchbox/*"]
+      "@/*": ["./*"]
     }
   },
-  "typeRoots": ["bw_matchbox/assets/modules/types/**/*"],
-  "include": ["bw_matchbox/assets/modules/**/*.ts", "bw_matchbox/assets/modules/**/*.js"],
-  "exclude": ["node_modules", ".git", ".vscode", "docs", "tests", "bw_matchbox.egg-info", "**/*_"]
+  "typeRoots": ["@types/**/*"],
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["node_modules", ".git", ".vscode", "docs", "tests", "**/*_"]
 }

@@ -22,10 +22,6 @@
 /types
 /utils
 
-# Ignore libraries
-
-/bw_matchbox/assets/js/libs/
-
 # Log files
 
 npm-debug.log*
@@ -33,7 +29,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Project folders
-bw_matchbox.egg-info
 docs
 tests
 
