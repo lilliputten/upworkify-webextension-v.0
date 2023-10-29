@@ -17,7 +17,7 @@ const usedStorage = browser.storage.local;
 const storagePrefix = 'upworkify:';
 const storageFiltersKey = storagePrefix + 'filters';
 
-console.log('Started chooseUpwork', getChangeTag(), {
+console.log('Started extensionMenu', getChangeTag(), {
   // hasInstalled,
   'window.hasInstalled': window.hasInstalled,
   sessionStorage,
@@ -34,7 +34,7 @@ window.filters = { ...defaultFilters };
 
 // usedStorage.set({ filters });
 usedStorage.get('filters').then(({ filters }) => {
-  console.log('[chooseUpwork:check filters]', filters, {
+  console.log('[extensionMenu:check filters]', filters, {
     filters,
   });
 });
@@ -67,7 +67,7 @@ function getCurrentTabPromise() {
 
 async function saveFilters() {
   // const json = JSON.stringify(filters);
-  console.log('[chooseUpwork:saveFilters]', {
+  console.log('[extensionMenu:saveFilters]', {
     filters: window.filters,
     // json,
     storageFiltersKey,
@@ -76,20 +76,20 @@ async function saveFilters() {
   // sessionStorage?.setItem(storageFiltersKey, json);
   // window.filters = filters;
   await usedStorage.set({ filters: window.filters });
-  console.log('[chooseUpwork:saveFilters] done');
+  console.log('[extensionMenu:saveFilters] done');
 }
 
 async function loadFilters() {
   // const json = sessionStorage?.getItem(storageFiltersKey);
   // filters = json ? JSON.parse(json) : { ...defaultFilters };
-  console.log('[chooseUpwork:loadFilters]', {
+  console.log('[extensionMenu:loadFilters]', {
     // filters,
     // json,
     storageFiltersKey,
     // 'window.filters': window.filters,
   });
   const { filters } = await usedStorage.get('filters');
-  console.log('[chooseUpwork:loadFilters] done', {
+  console.log('[extensionMenu:loadFilters] done', {
     filters,
     storageFiltersKey,
   });
@@ -98,7 +98,7 @@ async function loadFilters() {
 
 function applyFilters() {
   const { filters } = window;
-  console.log('[chooseUpwork:applyFilters]', {
+  console.log('[extensionMenu:applyFilters]', {
     filters,
   });
   // Save filters in storage...
@@ -114,7 +114,7 @@ function applyFilters() {
 
 function resetFilters() {
   const { filters } = window;
-  console.log('[chooseUpwork:resetFilters]', {
+  console.log('[extensionMenu:resetFilters]', {
     filters,
   });
   // Reset filters data and interface...
@@ -148,7 +148,7 @@ function resetFilterControls() {
  *    * Given the name of a upwork, get the URL to the corresponding image.
  *    <]
  *   function upworkNameToURL(upworkName) {
- *     console.log('[chooseUpwork:listenForClicks:upworkNameToURL]', {
+ *     console.log('[extensionMenu:listenForClicks:upworkNameToURL]', {
  *       upworkName,
  *     });
  *     switch (upworkName) {
@@ -166,7 +166,7 @@ function resetFilterControls() {
  *    * send a "upworkify" message to the content script in the active tab.
  *    <]
  *   function doUpworkify(tabs) {
- *     console.log('[chooseUpwork:listenForClicks:doUpworkify]', {
+ *     console.log('[extensionMenu:listenForClicks:doUpworkify]', {
  *       hasInstalled,
  *       'window.hasInstalled': window.hasInstalled,
  *       tabs,
@@ -190,7 +190,7 @@ function resetFilterControls() {
  *    * send a "reset" message to the content script in the active tab.
  *    <]
  *   function doReset(tabs) {
- *     console.log('[chooseUpwork:listenForClicks:doReset]', {
+ *     console.log('[extensionMenu:listenForClicks:doReset]', {
  *       hasInstalled,
  *       'window.hasInstalled': window.hasInstalled,
  *       tabs,
@@ -210,7 +210,7 @@ function resetFilterControls() {
  *    * Just log the error to the console.
  *    <]
  *   function reportError(error) {
- *     console.error('[chooseUpwork:reportError]', error.message, {
+ *     console.error('[extensionMenu:reportError]', error.message, {
  *       error,
  *     });
  *     debugger;
@@ -248,7 +248,7 @@ function updatePopupContent() {
     showCountries,
     showRecents,
   } = filters;
-  console.log('[chooseUpwork:updatePopupContent]', {
+  console.log('[extensionMenu:updatePopupContent]', {
     showCountries,
     showRecents,
     filters,
@@ -262,7 +262,7 @@ function userActions() {
   const showCountriesCheckbox = getShowCountriesCheckbox();
   const applyButton = getApplyButton();
   const resetButton = getResetButton();
-  console.log('[chooseUpwork:userActions]', {
+  console.log('[extensionMenu:userActions]', {
     showCountriesCheckbox,
     applyButton,
     resetButton,
@@ -270,7 +270,7 @@ function userActions() {
   showCountriesCheckbox?.addEventListener('change', (ev) => {
     const { currentTarget } = ev;
     const { checked } = currentTarget;
-    /* console.log('[chooseUpwork:showCountries:onChange]', {
+    /* console.log('[extensionMenu:showCountries:onChange]', {
      *   checked,
      *   ev,
      * });
@@ -287,7 +287,7 @@ function userActions() {
 function reportExecuteScriptError(error) {
   document.querySelector('#popup-content').classList.add('hidden');
   document.querySelector('#error-content').classList.remove('hidden');
-  console.error('[chooseUpwork:reportExecuteScriptError]', error.message, {
+  console.error('[extensionMenu:reportExecuteScriptError]', error.message, {
     error,
   });
 }
