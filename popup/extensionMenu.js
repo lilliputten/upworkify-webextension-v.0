@@ -82,11 +82,11 @@ body.upworkify-filters-applied .row.app-frame > aside {
 }
 body.upworkify-filters-applied [data-test="job-tile-list"] .up-card-section {
   /* Dim unprocessed items */
-  opacity: .7;
+  /* opacity: .7; */
 }
 body.upworkify-filters-applied [data-test="job-tile-list"] .up-card-section.processed {
   /* Dim unprocessed items */
-  opacity: 1;
+  /* opacity: 1; */
   border: 2px solid rgba(100,100,100,.2); /* DEBUG */
   border-radius: 8px;
   margin: 10px auto;
