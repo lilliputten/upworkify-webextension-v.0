@@ -2,7 +2,7 @@
 /* globals browser */
 /* eslint-disable no-console */
 /*!
- * @changed 2023.11.07, 17:35
+ * @changed 2023.11.07, 17:40
  * @desc Main client code -- works inside target page.
  */
 
@@ -83,7 +83,7 @@
   window.__upworkifyChangedTag = changedTag;
 
   function getChangeTag() {
-    const tag = `@changed 2023.11.07, 17:35
+    const tag = `@changed 2023.11.07, 17:40
     `.trim();
     return tag;
   }
@@ -195,7 +195,7 @@
    */
   function getRecentDaysCount(agoText) {
     agoText = agoText.trim().toLowerCase();
-    const isAgo = agoText.endsWith(' ago');
+    const isAgo = agoText.startsWith('in ') || agoText.endsWith(' ago');
     if (isAgo) {
       // Try to parse smth like '[in ]N {minute|hour|day}[s] ago' text...
       const found = agoText.match(/^(?:in )*(\d+)\s+(\S+)/);
